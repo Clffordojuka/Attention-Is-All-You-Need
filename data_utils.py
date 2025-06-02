@@ -1,20 +1,33 @@
-
+import json
 import numpy as np
 
-def build_sine_wave(X, frequency, amplitude):
-    """Builds the sine wave given a time step,
-    a frequency value and an amplitude value""" 
-    return amplitude * np.sin(X*frequency)
+def load_json(filepath):
+    with open(filepath, 'r') as f:
+        return json.load(f)
+
+def build_sine_wave(X: np.ndarray, frequency: float, amplitude: float) -> np.ndarray:
+    """
+    Builds a sine wave from a time array, frequency, and amplitude.
+    """
+    return amplitude * np.sin(X * frequency)
 
 
-def build_modified_sine_wave(X, frequency, amplitude, loc, length):
-    return modify_sine(build_sine_wave(X,frequency, amplitude), loc, length)
-
-
-def modify_sine(sine_wave, loc, length):
-    """Modified the sine_wave from loc to 
-    loc+length""" 
+def modify_sine(sine_wave: np.ndarray, loc: int, length: int) -> np.ndarray:
+    """
+    Modifies a section of the sine wave by flattening it 
+    between indices [loc, loc + length).
+    """
     new_sine_wave = sine_wave.copy()
-    x_value = sine_wave[loc]
-    new_sine_wave[loc:loc+length] = x_value
+    end = min(loc + length, len(sine_wave))  # Prevent index out-of-bounds
+    flat_value = sine_wave[loc]
+    new_sine_wave[loc:end] = flat_value
     return new_sine_wave
+
+
+def build_modified_sine_wave(X: np.ndarray, frequency: float, amplitude: float, loc: int, length: int) -> np.ndarray:
+    """
+    Generates a sine wave and modifies it in a localized region.
+    Useful for simulating anomalies.
+    """
+    sine_wave = build_sine_wave(X, frequency, amplitude)
+    return modify_sine(sine_wave, loc, length)
